@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: true }));
 
 let requestsList = [];
 
-// 1. Home Page (Form)
+// 1. Home Page
 app.get('/', (req, res) => {
     res.send(`<!DOCTYPE html>
 <html lang="en">
@@ -15,36 +15,32 @@ app.get('/', (req, res) => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin ko Message Bhejein</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#0b132b] text-white font-sans flex items-center justify-center min-h-screen p-3">
-    <div class="bg-[#1c2541] p-4 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700">
-        <h1 class="text-lg font-bold mb-0.5">Admin ko Message Bhejein</h1>
-        <p class="text-gray-400 text-[10px] mb-2">Aapka koi bhi personal detail public nahi hoga.</p>
+<body class="bg-[#0b132b] text-white font-sans flex items-center justify-center min-h-screen p-4">
+    <div class="bg-[#1c2541] p-5 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700">
+        <h1 class="text-lg font-bold mb-1">Admin ko Message Bhejein</h1>
+        <p class="text-gray-400 text-xs mb-3">Aapka koi bhi personal detail public nahi hoga.</p>
 
-        <div class="text-[11px] text-gray-300 bg-[#0b132b] p-2 rounded-lg mb-2.5 border border-slate-700 space-y-0.5">
-            <p>📅 Release Example: 2023-09-21</p>
-            <p>🔈 Audio Example: Hindi</p>
+        <div class="text-xs text-gray-300 bg-[#0b132b] p-2.5 rounded-lg mb-3 border border-slate-700 space-y-1">
+            <p>🍿 <b>Movie Name</b></p>
+            <p>📅 <b>Release Date Example:</b> 2023-09-21</p>
+            <p>🔈 <b>Audio Example:</b> Hindi</p>
         </div>
 
-        <form id="f" class="space-y-2.5">
+        <form id="f" class="space-y-3">
             <div>
-                <label class="block text-[11px] text-gray-300 mb-1">Aapka Naam:</label>
-                <input type="text" id="name" required class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <label class="block text-xs text-gray-300 mb-1">Aapka Naam:</label>
+                <input type="text" id="name" required class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
             </div>
             <div>
-                <label class="block text-[11px] text-gray-300 mb-1">WhatsApp ya Telegram Contact:</label>
-                <input type="text" id="contact" required placeholder="Number ya ID daliye..." class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <label class="block text-xs text-gray-300 mb-1">Aapka Message:</label>
+                <textarea id="message" rows="3" required placeholder="Movie details likhein..." class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
             </div>
-            <div>
-                <label class="block text-[11px] text-gray-300 mb-1">Aapka Message:</label>
-                <textarea id="message" rows="2" required placeholder="Movie details likhein..." class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
-            </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl text-xs transition duration-200 shadow-md">Message Bhejein</button>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl text-xs transition duration-200 shadow-md">Message Bhejein</button>
         </form>
 
-        <div id="box" class="mt-3 hidden p-2.5 rounded-xl bg-[#0b132b] border border-blue-500/50 text-[11px] text-amber-200">
+        <div id="box" class="mt-3 hidden p-3 rounded-xl bg-[#0b132b] border border-blue-500/50 text-xs text-amber-200">
             <p id="txt" class="text-center"></p>
         </div>
     </div>
@@ -53,7 +49,6 @@ app.get('/', (req, res) => {
         document.getElementById('f').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('name').value;
-            const contact = document.getElementById('contact').value;
             const message = document.getElementById('message').value;
             const box = document.getElementById('box');
             const txt = document.getElementById('txt');
@@ -65,11 +60,11 @@ app.get('/', (req, res) => {
                 const response = await fetch('/send-message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, contact, message })
+                    body: JSON.stringify({ name, message })
                 });
                 
                 if(response.ok) {
-                    txt.innerHTML = "✅ <b>Request 30 min mein puri hogi.</b><br>Pehle friend ko share karein:<br>👉 <a href='https://whatsapp.com/channel/0029Vb6cJETKGGGClbSzWb2a' target='_blank' class='text-amber-400 underline font-bold'>WhatsApp Channel Join Karein</a>";
+                    txt.innerHTML = "✅ <b>Request 30 min mein puri hogi.</b><br><br>Pehle friend ko share karein:<br>👉 <a href='https://whatsapp.com/channel/0029Vb6cJETKGGGClbSzWb2a' target='_blank' class='text-amber-400 underline font-bold'>WhatsApp Channel Join Karein</a>";
                     document.getElementById('f').reset();
                 } else {
                     txt.textContent = "Kuch error aayi, dubara try karein.";
@@ -83,13 +78,13 @@ app.get('/', (req, res) => {
 </html>`);
 });
 
-// 2. Admin Panel Page (Jahan sari requests dikhengi)
+// 2. Admin Panel
 app.get('/admin', (req, res) => {
     let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title><script src="https://tailwindcss.com"></script>
+    <title>Admin Panel</title><script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white p-4 text-xs">
     <div class="max-w-xl mx-auto space-y-3">
@@ -101,13 +96,13 @@ app.get('/admin', (req, res) => {
         requestsList.slice().reverse().forEach((item) => {
             html += `
             <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-1">
-                <p><b>Naam:</b> ${item.name} | <b>Contact:</b> <span class="text-green-400">${item.contact}</span></p>
+                <p><b>Naam:</b> ${item.name}</p>
                 <p><b>Details:</b> ${item.message}</p>
                 <p><b>Status:</b> <span class="text-blue-400">${item.reply}</span></p>
                 <form action="/admin-reply" method="POST" class="flex gap-2 mt-2">
                     <input type="hidden" name="id" value="${item.id}">
-                    <input type="text" name="replyText" placeholder="Reply likhein..." required class="flex-1 bg-slate-950 border border-slate-700 rounded p-1 text-white">
-                    <button type="submit" class="bg-blue-600 px-3 py-1 rounded font-bold">Send</button>
+                    <input type="text" name="replyText" placeholder="Reply likhein..." required class="flex-1 bg-slate-950 border border-slate-700 rounded p-1.5 text-white">
+                    <button type="submit" class="bg-blue-600 px-3 py-1.5 rounded font-bold">Send</button>
                 </form>
             </div>`;
         });
@@ -116,19 +111,18 @@ app.get('/admin', (req, res) => {
     res.send(html);
 });
 
-// 3. Form Data Recipient Route
+// 3. API Route
 app.post('/send-message', (req, res) => {
     try {
-        const { name, contact, message } = req.body;
-        // Data seedha website ke internal list mein save ho jayega
-        requestsList.push({ id: Date.now(), name, contact, message, reply: "Pending..." });
+        const { name, message } = req.body;
+        requestsList.push({ id: Date.now(), name, contact: "N/A", message, reply: "Pending..." });
         return res.status(200).json({ success: true });
     } catch (error) {
         return res.status(500).json({ success: false });
     }
 });
 
-// 4. Admin Reply Route
+// 4. Admin Reply
 app.post('/admin-reply', (req, res) => {
     const { id, replyText } = req.body;
     const item = requestsList.find(r => r.id == id);
