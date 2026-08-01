@@ -1,91 +1,58 @@
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 8000;
+<?php
+$file = 'messages.txt';
+$success = "";
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.get('/', (req, res) => {
-    res.send(`<!DOCTYPE html>
-<html lang="en">
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_msg'])) {
+    $name = trim($_POST['name']);
+    $contact = trim($_POST['contact']);
+    $message = trim($_POST['message']);
+    
+    if(!empty($name) && !empty($contact) && !empty($message)) {
+        $time = date('Y-m-d H:i:s');
+        // Unique ID, Name, Contact, Message, Status, Reply format
+        $entry = uniqid() . "|||" . $name . "|||" . $contact . "|||" . $message . "|||Pending|||" . $time . "\n";
+        file_put_contents($file, $entry, FILE_APPEND | LOCK_EX);
+        $success = "Aapka message admin tak successfully bhej diya gaya hai!";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin ko Message Bhejein</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Admin se Sampark Karein</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #0f172a; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { background: #1e293b; padding: 25px; border-radius: 10px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #94a3b8; font-size: 14px; }
+        input, textarea { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        button { background: #3b82f6; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        .msg { color: #34d399; font-size: 14px; text-align: center; margin-bottom: 15px; background: #065f46; padding: 8px; border-radius: 4px; }
+    </style>
 </head>
-<body class="bg-slate-900 text-white font-sans flex items-center justify-center min-h-screen p-4">
-    <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-md">
-        <h1 class="text-2xl font-bold mb-2">Admin ko Message Bhejein</h1>
-        <p class="text-gray-400 text-sm mb-3">Aapka koi bhi personal detail public nahi hoga.</p>
-        
-        <div class="mb-4 space-y-1 text-sm text-amber-400">
-            <p class="font-bold">🍿 Movie Name</p>
-            <p class="font-bold">📅 Release Date Example: 2023-09-21</p>
-            <p class="font-bold">🔈 Audio Example: Hindi</p>
+<body>
+<div class="box">
+    <h2>Admin ko Message Bhejein</h2>
+    <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Aapka koi bhi personal detail public nahi hoga.</p>
+    <?php if($success) echo "<div class='msg'>$success</div>"; ?>
+    <form method="POST">
+        <div class="form-group">
+            <label>Aapka Naam:</label>
+            <input type="text" name="name" required>
         </div>
-
-        <form id="msgForm" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Aapka Naam:</label>
-                <input type="text" id="name" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Aapka Email ya Contact:</label>
-                <input type="text" id="contact" required placeholder="Email ya Telegram ID" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Aapka Message:</label>
-                <textarea id="message" rows="4" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500"></textarea>
-            </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200">Message Bhejein</button>
-        </form>
-        <p id="status" class="text-center text-sm mt-3 text-green-400 hidden"></p>
-    </div>
-
-    <script>
-        document.getElementById('msgForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const contact = document.getElementById('contact').value;
-            const message = document.getElementById('message').value;
-            const status = document.getElementById('status');
-
-            status.textContent = "Bhej raha hai...";
-            status.classList.remove('hidden');
-
-            try {
-                const response = await fetch('/send-message', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, contact, message })
-                });
-                
-                if(response.ok) {
-                    status.textContent = "Message successfully bhej diya gaya hai!";
-                    document.getElementById('msgForm').reset();
-                } else {
-                    status.textContent = "Kuch error aayi, dubara try karein.";
-                }
-            } catch (err) {
-                status.textContent = "Server error!";
-            }
-        });
-    </script>
+        <div class="form-group">
+            <label>Aapka Email ya Contact:</label>
+            <input type="text" name="contact" placeholder="Email ya Telegram ID" required>
+        </div>
+        <div class="form-group">
+            <label>Aapka Message:</label>
+            <textarea name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit" name="send_msg">Message Bhejein</button>
+    </form>
+</div>
 </body>
-</html>`);
-});
-
-// Yahan form ka data receive hokar Telegram bot par jayega
-app.post('/send-message', async (req, res) => {
-    const { name, contact, message } = req.body;
-    
-    // Yahan aap apne Telegram Bot API ka code likh sakte hain jo yeh message aapke Telegram par bhej dega
-    console.log(`New Message from ${name} (${contact}): ${message}`);
-    
-    res.status(200).send({ success: true });
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+</html>
