@@ -10,7 +10,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_msg'])) {
         $time = date('Y-m-d H:i:s');
         $auto_reply = "Apka Movie Request complete ho jayaga 30 minets ma But aapko Movie Channel ka link Aapke Freind ko share karna paraga aur uska screenshot sent karo. WhatsApp Channel: https://whatsapp.com/channel/0029Vb6cJETKGGGClbSzWb2a";
         
-        // Format: ID ||| Name ||| Request/Message ||| Admin Custom Reply ||| Status ||| Time
         $entry = uniqid() . "|||" . $name . "|||" . $movie_details . "|||" . $auto_reply . "|||Pending|||" . $time . "\n";
         file_put_contents($file, $entry, FILE_APPEND | LOCK_EX);
         
@@ -33,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_msg'])) {
         button { background: #3b82f6; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
         button:hover { background: #2563eb; }
         .msg { color: #34d399; font-size: 13px; text-align: left; margin-bottom: 15px; background: #065f46; padding: 12px; border-radius: 5px; line-height: 1.4; }
-        .format-box { background: #0f172a; padding: 10px; border-radius: 5px; border: 1px dashed #475569; margin-bottom: 15px; font-size: 13px; color: #fbbf24; }
+        .format-box { background: #0f172a; padding: 10px; border-radius: 5px; border: 1px dashed #475569; margin-bottom: 15px; font-size: 13px; color: #fbbf24; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -42,9 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_msg'])) {
     <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">Aapka koi bhi personal detail public nahi hoga.</p>
     
     <div class="format-box">
-        <strong>🍿 Movie Name:</strong><br>
-        <strong>📅 Release Date Example:</strong> 2023-09-21<br>
-        <strong>🔈 Audio Example:</strong> Hindi
+        <b>🍿 Movie Name:</b><br>
+        <b>📅 Release Date Example: 2023-09-21</b><br>
+        <b>🔈 Audio Example: Hindi</b>
     </div>
 
     <?php if($success_msg) echo "<div class='msg'>$success_msg</div>"; ?>
@@ -55,8 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_msg'])) {
             <input type="text" name="name" required>
         </div>
         <div class="form-group">
-            <label>Movie Details (Upar diye format me likhein):</label>
-            <textarea name="movie_details" rows="4" placeholder="🍿 Movie Name: ...&#10;📅 Release Date: ...&#10;🔈 Audio: ..." required></textarea>
+            <label>Movie Details:</label>
+            <textarea name="movie_details" rows="4" placeholder="🍿 Movie Name: ...&#10;📅 Release Date: 2023-09-21&#10;🔈 Audio: Hindi" required></textarea>
         </div>
         <button type="submit" name="send_msg">Request Bhejein</button>
     </form>
