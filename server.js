@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
     <div class="bg-slate-800 p-4 rounded-xl shadow-lg w-full max-w-sm border border-slate-700">
         <h1 class="text-lg font-bold text-center text-amber-400 mb-1">🎬 Movie Request</h1>
         
-        <p class="text-[11px] text-amber-300 bg-slate-900 p-2 rounded-lg mb-2 border border-slate-700">
+        <p class="text-[11px] text-amber-300 bg-slate-900 p-2 rounded-lg mb-2 border border-slate-700 text-center">
             🍿 Naam | 📅 2023-09-21 | 🔈 Hindi
         </p>
 
@@ -37,8 +37,8 @@ app.get('/', (req, res) => {
             <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-2 rounded-lg text-xs">Request Bhejein</button>
         </form>
 
-        <div id="box" class="mt-3 hidden p-2 rounded-lg bg-slate-900 border border-amber-500/50 text-[11px] text-amber-200">
-            <p id="txt"></p>
+        <div id="box" class="mt-2 hidden p-2 rounded-lg bg-slate-900 border border-amber-500/50 text-[11px] text-amber-200">
+            <p id="txt" class="text-center"></p>
         </div>
     </div>
 
@@ -54,17 +54,21 @@ app.get('/', (req, res) => {
             txt.textContent = "Bhej raha hai...";
             box.classList.remove('hidden');
 
-            const res = await fetch('/send-message', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, contact, message })
-            });
-            
-            if(res.ok) {
-                txt.innerHTML = "✅ <b>Request 30 min mein puri hogi.</b><br>Pehle friend ko share karein:<br>👉 <a href='https://whatsapp.com/channel/0029Vb6cJETKGGGClbSzWb2a' target='_blank' class='text-amber-400 underline font-bold'>WhatsApp Channel Join Karein</a>";
-                document.getElementById('f').reset();
-            } else {
-                txt.textContent = "Error aayi, dubara try karein.";
+            try {
+                const res = await fetch('/send-message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, contact, message })
+                });
+                
+                if(res.ok) {
+                    txt.innerHTML = "✅ <b>Request 30 min mein puri hogi.</b><br>Pehle friend ko share karein:<br>👉 <a href='https://whatsapp.com/channel/0029Vb6cJETKGGGClbSzWb2a' target='_blank' class='text-amber-400 underline font-bold'>WhatsApp Channel Join Karein</a>";
+                    document.getElementById('f').reset();
+                } else {
+                    txt.textContent = "Kuch error aayi, dubara try karein.";
+                }
+            } catch (err) {
+                txt.textContent = "Server connection error!";
             }
         });
     </script>
@@ -119,7 +123,7 @@ app.post('/send-message', async (req, res) => {
             });
         } catch (e) {}
     }
-    res.status(200).send({ success: true });
+    res.sendStatus(200);
 });
 
 app.post('/admin-reply', (req, res) => {
