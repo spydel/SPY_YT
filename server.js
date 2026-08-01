@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: true }));
 
 let requestsList = [];
 
-// 1. Home Page
+// 1. Home Page (Clean form without contact field)
 app.get('/', (req, res) => {
     res.send(`<!DOCTYPE html>
 <html lang="en">
@@ -115,7 +115,7 @@ app.get('/admin', (req, res) => {
 app.post('/send-message', (req, res) => {
     try {
         const { name, message } = req.body;
-        requestsList.push({ id: Date.now(), name, contact: "N/A", message, reply: "Pending..." });
+        requestsList.push({ id: Date.now(), name, message, reply: "Pending..." });
         return res.status(200).json({ success: true });
     } catch (error) {
         return res.status(500).json({ success: false });
@@ -131,4 +131,3 @@ app.post('/admin-reply', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Running on ${PORT}`));
-
