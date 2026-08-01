@@ -1,12 +1,19 @@
 <?php
-$db = new PDO('sqlite:messages.db');
-$db->exec("CREATE TABLE IF NOT EXISTS msgs (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, contact TEXT, message TEXT, reply TEXT, status TEXT DEFAULT 'Pending', time TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
-
+$file = 'messages.txt';
 $success = "";
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_msg'])) {
-    $stmt = $db->prepare("INSERT INTO msgs (name, contact, message) VALUES (?, ?, ?)");
-    $stmt->execute([$_POST['name'], $_POST['contact'], $_POST['message']]);
-    $success = "Aapka message admin tak successfully bhej diya gaya hai!";
+    $name = trim($_POST['name']);
+    $contact = trim($_POST['contact']);
+    $message = trim($_POST['message']);
+    
+    if(!empty($name) && !empty($contact) && !empty($message)) {
+        $time = date('Y-m-d H:i:s');
+        // Unique ID, Name, Contact, Message, Status, Reply format
+        $entry = uniqid() . "|||" . $name . "|||" . $contact . "|||" . $message . "|||Pending|||" . $time . "\n";
+        file_put_contents($file, $entry, FILE_APPEND | LOCK_EX);
+        $success = "Aapka message admin tak successfully bhej diya gaya hai!";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -29,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_msg'])) {
 <body>
 <div class="box">
     <h2>Admin ko Message Bhejein</h2>
-    <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Aapka koi bhi personal detail ya number public nahi hoga.</p>
+    <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Aapka koi bhi personal detail public nahi hoga.</p>
     <?php if($success) echo "<div class='msg'>$success</div>"; ?>
     <form method="POST">
         <div class="form-group">
@@ -37,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_msg'])) {
             <input type="text" name="name" required>
         </div>
         <div class="form-group">
-            <label>Aapka Email ya Contact (Jisse hum reply kar sakein):</label>
+            <label>Aapka Email ya Contact:</label>
             <input type="text" name="contact" placeholder="Email ya Telegram ID" required>
         </div>
         <div class="form-group">
