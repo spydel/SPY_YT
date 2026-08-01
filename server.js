@@ -13,31 +13,31 @@ app.get('/', (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Request</title>
+    <title>Admin ko Message Bhejein</title>
     <script src="https://tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-white flex items-center justify-center min-h-screen p-2">
-    <div class="bg-slate-800 p-4 rounded-xl shadow-lg w-full max-w-sm border border-slate-700">
-        <h1 class="text-lg font-bold text-center text-amber-400 mb-1">🎬 Movie Request</h1>
-        
-        <p class="text-[11px] text-amber-300 bg-slate-900 p-2 rounded-lg mb-2 border border-slate-700 text-center">
-            🍿 Naam | 📅 2023-09-21 | 🔈 Hindi
-        </p>
+<body class="bg-[#0b132b] text-white flex items-center justify-center min-h-screen p-3">
+    <div class="bg-[#1c2541] p-4 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700">
+        <h1 class="text-lg font-bold mb-0.5">Admin ko Message Bhejein</h1>
+        <p class="text-gray-400 text-[10px] mb-3">Aapka koi bhi personal detail public nahi hoga.</p>
 
-        <form id="f" class="space-y-2">
+        <form id="f" class="space-y-2.5">
             <div>
-                <input type="text" id="name" required placeholder="Aapka Naam" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                <label class="block text-[11px] text-gray-300 mb-1">Aapka Naam:</label>
+                <input type="text" id="name" required class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500">
             </div>
             <div>
-                <input type="text" id="contact" required placeholder="WhatsApp / Telegram Number" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                <label class="block text-[11px] text-gray-300 mb-1">WhatsApp ya Telegram Number / ID:</label>
+                <input type="text" id="contact" required placeholder="Number ya Telegram ID daliye..." class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500">
             </div>
             <div>
-                <textarea id="message" rows="2" required placeholder="Movie Details (Naam, Date, Audio)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+                <label class="block text-[11px] text-gray-300 mb-1">Aapka Message:</label>
+                <textarea id="message" rows="2" required placeholder="Movie details likhein..." class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
             </div>
-            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-2 rounded-lg text-xs">Request Bhejein</button>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl text-xs transition duration-200 shadow-md">Message Bhejein</button>
         </form>
 
-        <div id="box" class="mt-2 hidden p-2 rounded-lg bg-slate-900 border border-amber-500/50 text-[11px] text-amber-200">
+        <div id="box" class="mt-3 hidden p-2.5 rounded-xl bg-[#0b132b] border border-blue-500/50 text-[11px] text-amber-200">
             <p id="txt" class="text-center"></p>
         </div>
     </div>
@@ -55,13 +55,13 @@ app.get('/', (req, res) => {
             box.classList.remove('hidden');
 
             try {
-                const res = await fetch('/send-message', {
+                const response = await fetch('/send-message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, contact, message })
                 });
                 
-                if(res.ok) {
+                if(response.ok) {
                     txt.innerHTML = "✅ <b>Request 30 min mein puri hogi.</b><br>Pehle friend ko share karein:<br>👉 <a href='https://whatsapp.com/channel/0029Vb6cJETKGGGClbSzWb2a' target='_blank' class='text-amber-400 underline font-bold'>WhatsApp Channel Join Karein</a>";
                     document.getElementById('f').reset();
                 } else {
@@ -109,21 +109,23 @@ app.get('/admin', (req, res) => {
 });
 
 app.post('/send-message', async (req, res) => {
-    const { name, contact, message } = req.body;
-    requestsList.push({ id: Date.now(), name, contact, message, reply: "Pending..." });
+    try {
+        const { name, contact, message } = req.body;
+        requestsList.push({ id: Date.now(), name, contact, message, reply: "Pending..." });
 
-    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-    const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-    if (BOT_TOKEN && CHAT_ID) {
-        try {
+        const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+        const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+        if (BOT_TOKEN && CHAT_ID) {
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: CHAT_ID, text: `🎬 Nayi Request:\nNaam: ${name}\nContact: ${contact}\nDetails: ${message}`, parse_mode: 'Markdown' })
             });
-        } catch (e) {}
+        }
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        return res.status(500).json({ success: false });
     }
-    res.sendStatus(200);
 });
 
 app.post('/admin-reply', (req, res) => {
