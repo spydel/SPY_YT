@@ -1,5 +1,4 @@
 const express = require('express');
-const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 8000;
 
@@ -8,6 +7,7 @@ app.use(express.urlencoded({ extended: true }));
 
 let requestsList = [];
 
+// 1. Home Page (Form)
 app.get('/', (req, res) => {
     res.send(`<!DOCTYPE html>
 <html lang="en">
@@ -34,8 +34,8 @@ app.get('/', (req, res) => {
                 <input type="text" id="name" required class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500">
             </div>
             <div>
-                <label class="block text-[11px] text-gray-300 mb-1">WhatsApp ya Telegram Number / ID:</label>
-                <input type="text" id="contact" required placeholder="Number ya Telegram ID daliye..." class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <label class="block text-[11px] text-gray-300 mb-1">WhatsApp ya Telegram Contact:</label>
+                <input type="text" id="contact" required placeholder="Number ya ID daliye..." class="w-full bg-[#0b132b] border border-slate-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500">
             </div>
             <div>
                 <label class="block text-[11px] text-gray-300 mb-1">Aapka Message:</label>
@@ -83,19 +83,20 @@ app.get('/', (req, res) => {
 </html>`);
 });
 
+// 2. Admin Panel Page (Jahan sari requests dikhengi)
 app.get('/admin', (req, res) => {
     let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title><script src="https://tailwindcss.com"></script>
+    <title>Admin Panel</title><script src="https://tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-white p-4 text-xs">
     <div class="max-w-xl mx-auto space-y-3">
-        <h1 class="text-xl font-bold text-amber-400 mb-4">👑 Admin Requests</h1>`;
+        <h1 class="text-xl font-bold text-amber-400 mb-4">👑 Admin Requests Panel</h1>`;
 
     if (requestsList.length === 0) {
-        html += `<p class="text-gray-400">Koi request nahi hai.</p>`;
+        html += `<p class="text-gray-400">Abhi koi request nahi aayi hai.</p>`;
     } else {
         requestsList.slice().reverse().forEach((item) => {
             html += `
@@ -115,43 +116,19 @@ app.get('/admin', (req, res) => {
     res.send(html);
 });
 
+// 3. Form Data Recipient Route
 app.post('/send-message', (req, res) => {
     try {
         const { name, contact, message } = req.body;
+        // Data seedha website ke internal list mein save ho jayega
         requestsList.push({ id: Date.now(), name, contact, message, reply: "Pending..." });
-
-        const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-        const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-
-        if (BOT_TOKEN && CHAT_ID) {
-            const data = JSON.stringify({
-                chat_id: CHAT_ID,
-                text: `🎬 Nayi Movie Request Aayi Hai!\n\n👤 Naam: ${name}\n📱 Contact: ${contact}\n💬 Details:\n${message}`,
-                parse_mode: 'Markdown'
-            });
-
-            const options = {
-                hostname: 'api.telegram.org',
-                path: `/bot${BOT_TOKEN}/sendMessage`,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': data.length
-                }
-            };
-
-            const tgReq = https.request(options, (tgRes) => {});
-            tgReq.on('error', (e) => console.error("Telegram Error:", e));
-            tgReq.write(data);
-            tgReq.end();
-        }
-
         return res.status(200).json({ success: true });
     } catch (error) {
         return res.status(500).json({ success: false });
     }
 });
 
+// 4. Admin Reply Route
 app.post('/admin-reply', (req, res) => {
     const { id, replyText } = req.body;
     const item = requestsList.find(r => r.id == id);
