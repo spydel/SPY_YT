@@ -3,7 +3,7 @@ $file = 'messages.txt';
 $success_msg = "";
 
 $upi_id = "BHARATPE.9Q0Q0K0Z8Q466572@unitype"; 
-$amount = "5"; 
+$amount = "2"; 
 $merchant_name = "Movie Store";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_msg'])) {
