@@ -6,15 +6,16 @@ $messages = [];
 
 foreach($lines as $line) {
     $parts = explode("|||", $line);
-    if(count($parts) >= 6) {
+    // Naye format ke hisab se check (Jisme screenshot path bhi hai)
+    if(count($parts) >= 7) {
         $messages[] = [
             'name' => $parts[1],
             'movie_details' => $parts[2],
-            'time' => $parts[5]
+            'screenshot' => $parts[3],
+            'time' => $parts[6]
         ];
     }
 }
-// Latest request sabse upar dikhane ke liye
 $messages = array_reverse($messages);
 ?>
 <!DOCTYPE html>
@@ -22,7 +23,7 @@ $messages = array_reverse($messages);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Movie Requests</title>
+    <title>Admin Dashboard - Screenshots</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #0f172a; color: #fff; padding: 20px; }
         .container { max-width: 700px; margin: 0 auto; }
@@ -31,18 +32,30 @@ $messages = array_reverse($messages);
         p { margin: 8px 0; line-height: 1.5; white-space: pre-wrap; background: #0f172a; padding: 10px; border-radius: 5px; border: 1px solid #334155; }
         small { color: #94a3b8; font-size: 12px; }
         h2 { text-align: center; color: #f8fafc; margin-bottom: 25px; }
+        .ss-img { max-width: 100%; height: auto; max-height: 250px; border-radius: 5px; margin-top: 8px; border: 1px solid #475569; display: block; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>🎬 Aayi Hui Movie Requests</h2>
+        <h2>🎬 Aayi Hui Movie Requests & Screenshots</h2>
         <?php if(empty($messages)) { echo "<p style='text-align:center;'>Abhi tak koi request nahi aayi hai.</p>"; } ?>
         
         <?php foreach($messages as $m): ?>
             <div class="card">
                 <h3>Naam: <?= htmlspecialchars($m['name']) ?></h3>
                 <p><strong>Movie Details:</strong><br><?= htmlspecialchars($m['movie_details']) ?></p>
-                <small>📅 Aane ka Samay: <?= $m['time'] ?></small>
+                
+                <?php if(!empty($m['screenshot']) && file_exists($m['screenshot'])): ?>
+                    <p style="margin-bottom: 5px;"><strong>Payment Screenshot:</strong></p>
+                    <a href="<?= htmlspecialchars($m['screenshot']) ?>" target="_blank">
+                        <img src="<?= htmlspecialchars($m['screenshot']) ?>" class="ss-img" alt="Payment Screenshot">
+                    </a>
+                    <small style="color: #38bdf8; display:block; margin-top:4px;">(Badi image dekhne ke liye click karein)</small>
+                <?php else: ?>
+                    <p><strong>Payment Screenshot:</strong> N/A</p>
+                <?php endif; ?>
+                
+                <small style="display:block; margin-top:10px;">📅 Samay: <?= $m['time'] ?></small>
             </div>
         <?php endforeach; ?>
     </div>
